@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/api/ventas/**").permitAll()
+
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(sessionManager ->
