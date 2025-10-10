@@ -1,5 +1,6 @@
 package Salsamentaria.salsamentaria.User;
 
+import Salsamentaria.salsamentaria.models.Venta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -66,4 +67,9 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return estado;
     }
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Venta> ventas;
+
+
 }

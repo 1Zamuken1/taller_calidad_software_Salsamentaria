@@ -19,7 +19,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    // 🔹 Registro
+    // Registro
     public AuthResponse register(RegisterRequest request) {
         User user = User.builder()
                 .nombre(request.getNombre())
@@ -38,7 +38,7 @@ public class AuthService {
                 .build();
     }
 
-    // 🔹 Login
+    // Login
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
