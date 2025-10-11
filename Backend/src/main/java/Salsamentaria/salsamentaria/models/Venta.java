@@ -1,6 +1,7 @@
 package Salsamentaria.salsamentaria.models;
 
 import Salsamentaria.salsamentaria.User.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,8 @@ public class Venta {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
+    @JsonIgnoreProperties({"ventas", "password", "authorities", "accountNonExpired", 
+                           "accountNonLocked", "credentialsNonExpired", "enabled"})
     private User usuario;
 
     @Column(nullable = false)
@@ -34,6 +37,7 @@ public class Venta {
     private EstadoVenta estado;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"venta"}) // Evitar loop
     private List<DetalleVenta> detalles;
 
     public enum EstadoVenta {

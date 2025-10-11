@@ -1,6 +1,7 @@
 package Salsamentaria.salsamentaria.User;
 
 import Salsamentaria.salsamentaria.models.Venta;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,14 +32,21 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String email;
 
+    @JsonIgnore // No serializar la contraseña en respuestas JSON
     @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
+    
     private Boolean estado = true;
 
+    @OneToMany(mappedBy = "usuario")
+    @JsonIgnore // Evitar loop de serialización con Venta
+    private List<Venta> ventas;
+
     @Override
+    @JsonIgnore // No serializar authorities
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
     }
@@ -49,27 +57,26 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return estado;
     }
-
-    @OneToMany(mappedBy = "usuario")
-    private List<Venta> ventas;
-
-
 }

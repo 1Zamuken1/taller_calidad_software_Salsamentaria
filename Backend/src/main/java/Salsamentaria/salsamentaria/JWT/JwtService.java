@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import Salsamentaria.salsamentaria.User.User;
 
 import java.security.Key;
 import java.util.Date;
@@ -18,11 +19,20 @@ import java.util.function.Function;
 public class JwtService {
 
     private static final String SECRET_KEY = "4D6251655468576D5A7134743777217A25432A462D4A614E645267556B587032";
-    // 🔒 clave secreta (64 caracteres hexadecimal = 256 bits)
 
-    // 🔹 Generar token
-    public String getToken(UserDetails user) {
-        return generateToken(new HashMap<>(), user);
+    // Generar token con información adicional del usuario
+    public String getToken(UserDetails userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        
+        // Si es una instancia de User, agregar información adicional
+        if (userDetails instanceof User) {
+            User user = (User) userDetails;
+            extraClaims.put("nombre", user.getNombre());
+            extraClaims.put("rol", user.getRol().toString());
+            extraClaims.put("id", user.getId());
+        }
+        
+        return generateToken(extraClaims, userDetails);
     }
 
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
@@ -35,18 +45,30 @@ public class JwtService {
                 .compact();
     }
 
-    // 🔹 Obtener nombre de usuario del token
+    // Extraer el nombre del token
+    public String extractNombre(String token) {
+        return extractClaim(token, claims -> claims.get("nombre", String.class));
+    }
+
+    // Extraer el rol del token
+    public String extractRol(String token) {
+        return extractClaim(token, claims -> claims.get("rol", String.class));
+    }
+
+    // Extraer el ID del usuario
+    public Integer extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("id", Integer.class));
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // 🔹 Verificar si un token es válido
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    // 🔹 Verificar expiración
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -55,13 +77,11 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    // 🔹 Obtener cualquier claim del token
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    // 🔹 Obtener todos los claims
     private Claims getAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
@@ -73,9 +93,5 @@ public class JwtService {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    private Date getExpiration(String token){
-        return extractClaim(token, Claims::getExpiration);
     }
 }

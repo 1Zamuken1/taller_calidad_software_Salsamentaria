@@ -1,5 +1,6 @@
 package Salsamentaria.salsamentaria.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,10 +18,12 @@ public class DetalleVenta {
 
     @ManyToOne
     @JoinColumn(name = "id_venta", nullable = false)
+    @JsonIgnoreProperties({"detalles", "usuario"}) // Evitar loop con Venta
     private Venta venta;
 
     @ManyToOne
     @JoinColumn(name = "id_producto", nullable = false)
+    @JsonIgnoreProperties({"detalles", "categoria"}) // Evitar loop con Producto
     private Producto producto;
 
     @Column(nullable = false)

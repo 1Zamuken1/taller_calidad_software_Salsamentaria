@@ -1,5 +1,6 @@
 package Salsamentaria.salsamentaria.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +38,6 @@ public class Producto {
     private Categoria categoria;
 
     @OneToMany(mappedBy = "producto")
+    @JsonIgnore // ← AGREGAR ESTA ANOTACIÓN para evitar serialización infinita
     private List<DetalleVenta> detalles;
-
 }
