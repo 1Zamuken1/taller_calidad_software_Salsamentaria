@@ -1,0 +1,122 @@
+<div class="categorias-container">
+  <div class="page-header mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="bi bi-tags me-2"></i>Gestión de Categorías
+      </h2>
+      <p class="text-muted mb-0">Administra las categorías de productos</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirModalCrear()">
+      <i class="bi bi-plus-circle me-2"></i>Nueva Categoría
+    </button>
+  </div>
+
+  <!-- Mensajes -->
+  <div *ngIf="mensajeExito" class="alert alert-success alert-dismissible fade show">
+    <i class="bi bi-check-circle me-2"></i>{{ mensajeExito }}
+    <button type="button" class="btn-close" (click)="mensajeExito = ''" aria-label="Close"></button>
+  </div>
+
+  <div *ngIf="mensajeError" class="alert alert-danger alert-dismissible fade show">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ mensajeError }}
+    <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Grid de categorías -->
+  <div *ngIf="!loading" class="row g-4">
+    <div *ngFor="let categoria of categorias" class="col-lg-4 col-md-6">
+      <div class="categoria-card">
+        <div class="categoria-icon">
+          <i class="bi bi-tag-fill"></i>
+        </div>
+        <div class="categoria-content">
+          <h5>{{ categoria.nombre }}</h5>
+          <p class="text-muted">{{ categoria.descripcion || 'Sin descripción' }}</p>
+        </div>
+        <div class="categoria-actions">
+          <button 
+            class="btn btn-sm btn-outline-primary" 
+            (click)="abrirModalEditar(categoria)"
+            title="Editar">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button 
+            class="btn btn-sm btn-outline-danger" 
+            (click)="eliminarCategoria(categoria.id_categoria)"
+            title="Eliminar">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin categorías -->
+    <div *ngIf="categorias.length === 0" class="col-12">
+      <div class="text-center py-5">
+        <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+        <h4 class="mt-3 text-muted">No hay categorías registradas</h4>
+        <p class="text-muted">Crea tu primera categoría para organizar los productos</p>
+        <button class="btn btn-primary mt-3" (click)="abrirModalCrear()">
+          <i class="bi bi-plus-circle me-2"></i>Crear Categoría
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear/editar categoría -->
+<div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi" [class.bi-plus-circle]="!isEditing" [class.bi-pencil]="isEditing"></i>
+          {{ isEditing ? 'Editar Categoría' : 'Nueva Categoría' }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Nombre *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="categoriaForm.nombre"
+              name="nombre"
+              placeholder="Ej: Embutidos"
+              required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea 
+              class="form-control" 
+              rows="3"
+              [(ngModel)]="categoriaForm.descripcion"
+              name="descripcion"
+              placeholder="Descripción de la categoría (opcional)"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" (click)="guardarCategoria()">
+          <i class="bi bi-save me-1"></i>
+          {{ isEditing ? 'Actualizar' : 'Crear' }} Categoría
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>

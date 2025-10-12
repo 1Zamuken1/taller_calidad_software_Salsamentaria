@@ -1,0 +1,161 @@
+<div class="container py-5">
+  <h2 class="text-center mb-5 fw-bold text-primary">
+    <i class="bi bi-cart3 me-2"></i>Mi Carrito de Compras
+  </h2>
+
+  <!-- Mensajes -->
+  <div *ngIf="mensajeExito" class="alert alert-success alert-dismissible fade show shadow-sm rounded-3">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ mensajeExito }}
+    <button type="button" class="btn-close" (click)="mensajeExito = ''" aria-label="Close"></button>
+  </div>
+
+  <div *ngIf="mensajeError" class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ mensajeError }}
+    <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Carrito vacío -->
+  <div *ngIf="items.length === 0 && !mensajeExito" class="text-center py-5">
+    <i class="bi bi-cart-x display-1 text-muted"></i>
+    <h4 class="mt-3 text-secondary">Tu carrito está vacío</h4>
+    <p class="text-muted">Agrega productos para comenzar a comprar</p>
+    <button class="btn btn-primary btn-lg mt-3 shadow-sm" routerLink="/productos">
+      <i class="bi bi-shop me-2"></i>Ver productos
+    </button>
+  </div>
+
+  <!-- Items del carrito -->
+  <div *ngIf="items.length > 0" class="row">
+    <!-- Lista de productos -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 mb-4 rounded-4">
+        <div class="card-body">
+          <h5 class="card-title fw-bold mb-4">
+            <i class="bi bi-basket me-2"></i>Productos ({{ items.length }})
+          </h5>
+
+          <div *ngFor="let item of items" class="row align-items-center border-bottom py-3 carrito-item">
+            <!-- Imagen -->
+            <div class="col-md-2 col-3">
+              <img
+                [src]="item.producto.imagen_url || 'https://via.placeholder.com/120x100?text=Producto'"
+                [alt]="item.producto.nombre"
+                class="img-fluid rounded-3 shadow-sm"
+                style="max-height: 90px; object-fit: cover;">
+            </div>
+
+            <!-- Información del producto -->
+            <div class="col-md-4 col-9">
+              <h6 class="fw-semibold mb-1">{{ item.producto.nombre }}</h6>
+              <p class="text-muted small mb-0">
+                <i class="bi bi-tag me-1"></i>${{ item.producto.precio | number:'1.0-0' }} c/u
+              </p>
+            </div>
+
+            <!-- Cantidad -->
+            <div class="col-md-3 col-6 mt-2 mt-md-0">
+              <div class="input-group input-group-sm rounded-3 overflow-hidden shadow-sm cantidad-container">
+                <button 
+                  class="btn btn-outline-secondary" 
+                  type="button"
+                  (click)="decrementar(item)"
+                  [disabled]="isProcessing">
+                  <i class="bi bi-dash-lg"></i>
+                </button>
+
+                <input 
+                  type="number" 
+                  class="form-control text-center border-0"
+                  [(ngModel)]="item.cantidad"
+                  (change)="actualizarCantidad(item.producto.id_producto, item.cantidad)"
+                  [max]="item.producto.stock"
+                  min="1"
+                  [disabled]="isProcessing">
+
+                <button 
+                  class="btn btn-outline-secondary" 
+                  type="button"
+                  (click)="incrementar(item)"
+                  [disabled]="isProcessing">
+                  <i class="bi bi-plus-lg"></i>
+                </button>
+              </div>
+              <small class="text-muted">Stock: {{ item.producto.stock }}</small>
+            </div>
+
+            <!-- Subtotal y eliminar -->
+            <div class="col-md-3 col-4 mt-2 mt-md-0 text-end">
+              <p class="fw-bold text-primary mb-1">${{ item.subtotal | number:'1.0-0' }}</p>
+              <button 
+                class="btn btn-sm btn-outline-danger rounded-circle shadow-sm"
+                (click)="eliminarItem(item.producto.id_producto)"
+                [disabled]="isProcessing"
+                title="Eliminar producto">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Botón vaciar carrito -->
+          <div class="text-end mt-3">
+            <button 
+              class="btn btn-outline-danger btn-sm px-3 shadow-sm"
+              (click)="vaciarCarrito()"
+              [disabled]="isProcessing">
+              <i class="bi bi-trash me-1"></i>Vaciar carrito
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón continuar comprando -->
+      <button class="btn btn-outline-primary shadow-sm" (click)="continuarComprando()">
+        <i class="bi bi-arrow-left-circle me-2"></i>Seguir comprando
+      </button>
+    </div>
+
+    <!-- Resumen de compra -->
+    <div class="col-lg-4 mt-4 mt-lg-0">
+      <div class="card shadow-sm border-0 rounded-4 sticky-top" style="top: 20px;">
+        <div class="card-body">
+          <h5 class="card-title fw-bold mb-4">
+            <i class="bi bi-receipt me-2"></i>Resumen de compra
+          </h5>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal</span>
+            <span class="fw-semibold">${{ total | number:'1.0-0' }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span>Envío</span>
+            <span class="text-success fw-semibold">Gratis</span>
+          </div>
+
+          <hr>
+
+          <div class="d-flex justify-content-between mb-4">
+            <span class="fw-bold">Total</span>
+            <span class="text-primary fs-4 fw-bold">${{ total | number:'1.0-0' }}</span>
+          </div>
+
+          <button 
+            class="btn btn-success w-100 py-2 shadow-sm"
+            (click)="finalizarCompra()"
+            [disabled]="isProcessing || items.length === 0">
+            <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!isProcessing" class="bi bi-check-circle-fill me-2"></i>
+            {{ isProcessing ? 'Procesando...' : 'Finalizar compra' }}
+          </button>
+
+          <div class="text-center mt-3">
+            <small class="text-muted">
+              <i class="bi bi-shield-lock-fill me-1"></i>
+              Compra segura con encriptación SSL
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

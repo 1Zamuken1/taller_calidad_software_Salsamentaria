@@ -1,0 +1,79 @@
+.card {
+  border: none;
+  border-radius: 14px;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.carrito-item:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.cantidad-container button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: white;
+}
+
+input.form-control:disabled {
+  background-color: #f1f1f1;
+}
+
+.alert {
+  font-size: 0.95rem;
+}
+
+.sticky-top {
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .sticky-top {
+    position: relative !important;
+    top: 0 !important;
+  }
+
+  .carrito-item {
+    text-align: center;
+  }
+
+  .carrito-item img {
+    margin-bottom: 8px;
+  }
+
+  .cantidad-container {
+    justify-content: center;
+  }
+}

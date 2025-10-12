@@ -1,0 +1,201 @@
+<div class="dashboard-container">
+  <div class="dashboard-header mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </h2>
+    <p class="text-muted">Resumen general de la salsamentaría</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading">
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-card blue">
+          <div class="stat-icon">
+            <i class="bi bi-cart-check"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.totalVentas }}</h3>
+            <p>Total Ventas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-card orange">
+          <div class="stat-icon">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.ventasPendientes }}</h3>
+            <p>Ventas Pendientes</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-card green">
+          <div class="stat-icon">
+            <i class="bi bi-box-seam"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.productosActivos }}</h3>
+            <p>Productos Activos</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-card red">
+          <div class="stat-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.stockBajo }}</h3>
+            <p>Stock Bajo</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="icon-box bg-primary bg-opacity-10 text-primary me-3">
+                <i class="bi bi-calendar-day"></i>
+              </div>
+              <div>
+                <h5 class="mb-0">{{ stats.ventasHoy }}</h5>
+                <small class="text-muted">Ventas de hoy</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="icon-box bg-success bg-opacity-10 text-success me-3">
+                <i class="bi bi-cash-stack"></i>
+              </div>
+              <div>
+                <h5 class="mb-0">${{ stats.ingresosMes | number:'1.0-0' }}</h5>
+                <small class="text-muted">Ingresos del mes</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-4">
+              <i class="bi bi-graph-up me-2"></i>Ventas de los últimos 7 días
+            </h5>
+            <div style="height: 300px;">
+              <canvas id="ventasChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-4">
+              <i class="bi bi-trophy me-2"></i>Top 5 Productos
+            </h5>
+            <div style="height: 300px;">
+              <canvas id="productosChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tables Row -->
+    <div class="row g-3">
+      <!-- Productos más vendidos -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-4">
+              <i class="bi bi-star me-2"></i>Productos Más Vendidos
+            </h5>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-end">Ingresos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let producto of productosTop">
+                    <td>{{ producto.nombre }}</td>
+                    <td class="text-center">
+                      <span class="badge bg-primary">{{ producto.cantidad }}</span>
+                    </td>
+                    <td class="text-end">${{ producto.ingresos | number:'1.0-0' }}</td>
+                  </tr>
+                  <tr *ngIf="productosTop.length === 0">
+                    <td colspan="3" class="text-center text-muted">No hay datos disponibles</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productos con stock bajo -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-4">
+              <i class="bi bi-exclamation-circle me-2 text-danger"></i>Productos con Stock Bajo
+            </h5>
+            <div class="list-group list-group-flush">
+              <div *ngFor="let producto of productosStockBajo" 
+                   class="list-group-item d-flex align-items-center">
+                <img 
+                  [src]="producto.imagen_url || 'https://via.placeholder.com/50'" 
+                  [alt]="producto.nombre"
+                  class="rounded me-3"
+                  style="width: 50px; height: 50px; object-fit: cover;">
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">{{ producto.nombre }}</h6>
+                  <small class="text-muted">ID: {{ producto.id_producto }}</small>
+                </div>
+                <span class="badge bg-danger">{{ producto.stock }} unidades</span>
+              </div>
+              <div *ngIf="productosStockBajo.length === 0" 
+                   class="list-group-item text-center text-muted">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Todos los productos tienen stock suficiente
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

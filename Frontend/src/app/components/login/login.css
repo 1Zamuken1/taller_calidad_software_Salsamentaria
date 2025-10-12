@@ -1,0 +1,68 @@
+/* Fondo con imagen difuminada y superposición */
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.65)
+    ),
+    url('https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1400&q=80')
+      no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Tarjeta de login */
+.login-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Títulos y texto */
+h2 {
+  letter-spacing: 0.5px;
+}
+
+.text-muted {
+  font-size: 0.9rem;
+}
+
+/* Inputs */
+.form-control {
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Botón principal */
+.btn-primary {
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+}
+
+/* Enlace inferior */
+a {
+  font-size: 0.9rem;
+}
+
+a:hover {
+  text-decoration: underline;
+}

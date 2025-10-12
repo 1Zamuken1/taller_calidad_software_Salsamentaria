@@ -1,0 +1,275 @@
+<div class="productos-container">
+  <div class="page-header mb-4">
+    <div>
+      <h2 class="fw-bold mb-1">
+        <i class="bi bi-box-seam me-2"></i>Gestión de Productos
+      </h2>
+      <p class="text-muted mb-0">Administra el catálogo de productos</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirModalCrear()">
+      <i class="bi bi-plus-circle me-2"></i>Nuevo Producto
+    </button>
+  </div>
+
+  <!-- Mensajes -->
+  <div *ngIf="mensajeExito" class="alert alert-success alert-dismissible fade show">
+    <i class="bi bi-check-circle me-2"></i>{{ mensajeExito }}
+    <button type="button" class="btn-close" (click)="mensajeExito = ''" aria-label="Close"></button>
+  </div>
+
+  <div *ngIf="mensajeError" class="alert alert-danger alert-dismissible fade show">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ mensajeError }}
+    <button type="button" class="btn-close" (click)="mensajeError = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Buscar por nombre o descripción..."
+              [(ngModel)]="searchTerm"
+              (input)="filtrarProductos()">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <select 
+            class="form-select" 
+            [(ngModel)]="selectedCategoria"
+            (change)="filtrarProductos()">
+            <option value="">Todas las categorías</option>
+            <option *ngFor="let cat of categorias" [value]="cat.id_categoria">
+              {{ cat.nombre }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-outline-secondary w-100" (click)="cargarDatos()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Recargar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Tabla de productos -->
+  <div *ngIf="!loading" class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Imagen</th>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th class="text-end">Precio</th>
+              <th class="text-center">Stock</th>
+              <th class="text-center">Estado</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let producto of productosFiltrados">
+              <td>
+                <img 
+                  [src]="producto.imagen_url || 'https://via.placeholder.com/60'" 
+                  [alt]="producto.nombre"
+                  class="producto-img">
+              </td>
+              <td>
+                <strong>{{ producto.nombre }}</strong>
+                <small class="d-block text-muted">{{ producto.descripcion || 'Sin descripción' }}</small>
+              </td>
+              <td>
+                <!-- ⭐ CORRECCIÓN: Usar operador de navegación segura ?. -->
+                <span class="badge bg-secondary">
+                  {{ producto.categoria?.nombre || 'Sin categoría' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <strong>${{ producto.precio | number:'1.0-0' }}</strong>
+              </td>
+              <td class="text-center">
+                <span [class]="getStockClass(producto.stock || 0)">
+                  {{ getStockText(producto.stock || 0) }}
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="form-check form-switch d-inline-block">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    [checked]="producto.estado"
+                    (change)="cambiarEstado(producto)"
+                    style="cursor: pointer;">
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm">
+                  <button 
+                    class="btn btn-outline-primary" 
+                    (click)="abrirModalEditar(producto)"
+                    title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button 
+                    class="btn btn-outline-danger" 
+                    (click)="eliminarProducto(producto.id_producto)"
+                    title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="productosFiltrados.length === 0">
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mb-0 mt-2">No se encontraron productos</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear/editar producto -->
+<div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi" [class.bi-plus-circle]="!isEditing" [class.bi-pencil]="isEditing"></i>
+          {{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Nombre del producto *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="productoForm.nombre"
+                name="nombre"
+                placeholder="Ej: Salchicha Premium"
+                required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Categoría *</label>
+              <select 
+                class="form-select" 
+                [(ngModel)]="categoriaSeleccionada"
+                name="categoria"
+                required>
+                <option [value]="0" disabled>Seleccionar...</option>
+                <option *ngFor="let cat of categorias" [value]="cat.id_categoria">
+                  {{ cat.nombre }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Descripción</label>
+              <textarea 
+                class="form-control" 
+                rows="3"
+                [(ngModel)]="productoForm.descripcion"
+                name="descripcion"
+                placeholder="Descripción del producto..."></textarea>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Precio *</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  [(ngModel)]="productoForm.precio"
+                  name="precio"
+                  min="0"
+                  step="100"
+                  required>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Stock *</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                [(ngModel)]="productoForm.stock"
+                name="stock"
+                min="0"
+                required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Estado</label>
+              <div class="form-check form-switch mt-2">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  [(ngModel)]="productoForm.estado"
+                  name="estado"
+                  id="estadoSwitch">
+                <label class="form-check-label" for="estadoSwitch">
+                  {{ productoForm.estado ? 'Activo' : 'Inactivo' }}
+                </label>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">URL de la imagen</label>
+              <input 
+                type="url" 
+                class="form-control" 
+                [(ngModel)]="productoForm.imagen_url"
+                name="imagen_url"
+                placeholder="https://ejemplo.com/imagen.jpg">
+              <small class="text-muted">URL pública de la imagen del producto</small>
+            </div>
+
+            <div *ngIf="productoForm.imagen_url" class="col-12">
+              <img 
+                [src]="productoForm.imagen_url" 
+                alt="Vista previa"
+                class="img-thumbnail"
+                style="max-height: 150px;">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" (click)="guardarProducto()">
+          <i class="bi bi-save me-1"></i>
+          {{ isEditing ? 'Actualizar' : 'Crear' }} Producto
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>

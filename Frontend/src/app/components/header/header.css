@@ -1,0 +1,22 @@
+/* Navbar general */
+.navbar {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1050; /* Se mantiene encima del resto de elementos */
+}
+
+/* Espaciador debajo del header para evitar superposición */
+.header-spacer {
+  height: 70px; /* Ajusta según el alto real del navbar */
+}
+
+/* Estilos del logo y marca */
+.navbar-brand {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Botón de cerrar sesión */
+button:hover {
+  transform: scale(1.05);
+  transition: 0.2s;
+}

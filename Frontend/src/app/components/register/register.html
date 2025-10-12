@@ -1,0 +1,89 @@
+<div class="register-container d-flex align-items-center justify-content-center">
+  <div class="register-card p-4 shadow">
+    <h2 class="text-center mb-3 text-success fw-bold">Crea tu cuenta</h2>
+    <p class="text-center text-muted mb-4">
+      Regístrate para comenzar a comprar y disfrutar de nuestros productos
+    </p>
+
+    <!-- Mensaje de error -->
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre completo</label>
+        <input
+          type="text"
+          class="form-control"
+          id="nombre"
+          required
+          [(ngModel)]="nombre"
+          name="nombre"
+          [disabled]="isLoading"
+          placeholder="Tu nombre completo"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo electrónico</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          required
+          [(ngModel)]="email"
+          name="email"
+          [disabled]="isLoading"
+          placeholder="tucorreo@ejemplo.com"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          required
+          minlength="6"
+          [(ngModel)]="password"
+          name="password"
+          [disabled]="isLoading"
+          placeholder="••••••••"
+        />
+        <div class="form-text">Mínimo 6 caracteres</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+        <input
+          type="password"
+          class="form-control"
+          id="confirmPassword"
+          required
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          [disabled]="isLoading"
+          placeholder="Repite tu contraseña"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-success w-100 py-2"
+        [disabled]="isLoading || !registerForm.valid"
+      >
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+        {{ isLoading ? 'Registrando...' : 'Registrarse' }}
+      </button>
+
+      <div class="mt-3 text-center">
+        <a routerLink="/login" class="text-decoration-none text-secondary">
+          ¿Ya tienes cuenta?
+          <span class="text-success fw-semibold">Inicia sesión</span>
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

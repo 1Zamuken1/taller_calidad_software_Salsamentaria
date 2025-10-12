@@ -1,0 +1,27 @@
+.product-card {
+  transition: all 0.25s ease-in-out;
+  border-radius: 1rem;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.transition-scale {
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .transition-scale {
+  transform: scale(1.1);
+}
+
+.btn-add {
+  transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+  background-color: #0d6efd;
+  opacity: 0.9;
+  transform: scale(1.03);
+}
