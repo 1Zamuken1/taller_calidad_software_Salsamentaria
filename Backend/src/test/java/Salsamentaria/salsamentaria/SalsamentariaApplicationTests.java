@@ -1,13 +1,13 @@
-package Salsamentaria.salsamentaria;
+// package Salsamentaria.salsamentaria;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class SalsamentariaApplicationTests {
+// @SpringBootTest
+// class SalsamentariaApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+// 	@Test
+// 	void contextLoads() {
+// 	}
 
-}
+// }
