@@ -1,0 +1,24 @@
+# Archivos de configuración con secretos
+application-prod.properties
+application-local.properties
+
+# Variables de entorno
+.env
+.env.local
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Build
+target/
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

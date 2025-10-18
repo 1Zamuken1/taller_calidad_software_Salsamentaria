@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import Salsamentaria.salsamentaria.User.User;
@@ -18,7 +19,13 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "4D6251655468576D5A7134743777217A25432A462D4A614E645267556B587032";
+    // CORRECCIÓN: Inyectar la clave desde application.properties
+    @Value("${jwt.secret.key}")
+    private String secretKey;
+
+    // ✅ CORRECCIÓN: Inyectar tiempo de expiración configurable
+    @Value("${jwt.expiration:86400000}") // Default 24 horas
+    private Long jwtExpiration;
 
     // Generar token con información adicional del usuario
     public String getToken(UserDetails userDetails) {
@@ -40,7 +47,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24h
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -91,7 +98,8 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        // CORRECCIÓN: Usar la clave inyectada desde properties
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
