@@ -28,6 +28,10 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    // ✅ SOLUCIÓN: Constantes para roles reutilizables
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_CLIENTE = "CLIENTE";
+    
     private final JwtAutenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authProvider;
 
@@ -55,11 +59,11 @@ public class SecurityConfig {
                         // Rutas públicas
                         .requestMatchers("/auth/**").permitAll()
                         
-                        // Rutas solo para ADMIN
-                        .requestMatchers("/api/productos/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/crear", "/api/editar/**", "/api/eliminar/**").hasRole("ADMIN")
-                        .requestMatchers("/api/categorias/crear", "/api/categorias/editar/**", "/api/categorias/eliminar/**").hasRole("ADMIN")
-                        .requestMatchers("/api/ventas/", "/api/ventas/usuario/**", "/api/ventas/*/estado").hasRole("ADMIN")
+                        // ✅ Rutas solo para ADMIN (usando constante)
+                        .requestMatchers("/api/productos/admin").hasRole(ROLE_ADMIN)
+                        .requestMatchers("/api/crear", "/api/editar/**", "/api/eliminar/**").hasRole(ROLE_ADMIN)
+                        .requestMatchers("/api/categorias/crear", "/api/categorias/editar/**", "/api/categorias/eliminar/**").hasRole(ROLE_ADMIN)
+                        .requestMatchers("/api/ventas/", "/api/ventas/usuario/**", "/api/ventas/*/estado").hasRole(ROLE_ADMIN)
                         
                         // Rutas autenticadas (ADMIN y CLIENTE)
                         .requestMatchers("/api/productos", "/api/productos/**").authenticated()
