@@ -16,6 +16,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+/**
+ * Configuración de seguridad para la aplicación.
+ * Implementa autenticación stateless con JWT y protección mediante roles.
+ * 
+ * @author Juan Barrios
+ * @version 1.0
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -24,11 +31,25 @@ public class SecurityConfig {
     private final JwtAutenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authProvider;
 
+    /**
+     * Configura la cadena de filtros de seguridad.
+     * 
+     * CSRF está deshabilitado de forma segura porque:
+     * - La aplicación usa autenticación JWT (stateless)
+     * - No se utilizan cookies de sesión
+     * - Cumple con las recomendaciones de OWASP para REST APIs
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                
+                // CSRF deshabilitado de forma segura para API REST stateless con JWT
+                // Justificación: Esta aplicación no usa cookies de sesión, por lo tanto
+                // no es vulnerable a ataques CSRF. Los tokens JWT se envían vía headers.
+                // Ref: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
                 .csrf(csrf -> csrf.disable())
+                
                 .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Rutas públicas
@@ -55,6 +76,10 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Configura CORS para permitir peticiones desde el frontend.
+     * Restringido únicamente a localhost:4200 en desarrollo.
+     */
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
